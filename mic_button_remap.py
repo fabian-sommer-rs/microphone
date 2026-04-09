@@ -60,14 +60,16 @@ def create_default_config(config_path: Path):
 # ---------------------------------------------------------------------------
 
 def execute_action(config: dict):
-    action_type = config.get("action_type", "keyboard_shortcut")
+    action_type = config.get("action_type", "url")
     action = config.get("action", "")
 
     if not action:
         logger.warning("No action configured")
         return
 
-    if action_type == "keyboard_shortcut":
+    if action_type == "url":
+        open_url(action)
+    elif action_type == "keyboard_shortcut":
         send_keyboard_shortcut(action)
     elif action_type == "command":
         logger.info("Running command: %s", action)
@@ -77,6 +79,13 @@ def execute_action(config: dict):
             logger.error("Failed: %s", e)
     else:
         logger.warning("Unknown action_type: %s", action_type)
+
+
+def open_url(url: str):
+    """Open a URL in the default browser. Cross-platform."""
+    import webbrowser
+    logger.info("Opening URL: %s", url)
+    webbrowser.open(url)
 
 
 def send_keyboard_shortcut(shortcut: str):

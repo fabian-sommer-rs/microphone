@@ -34,8 +34,8 @@ Bearbeite `config.json`:
 ```json
 {
     "device_name": "",
-    "action_type": "keyboard_shortcut",
-    "action": "ctrl+shift+n",
+    "action_type": "url",
+    "action": "https://app.curala/new",
     "block_original": true,
     "trigger_on": "press",
     "auto_reconnect": true
@@ -45,13 +45,21 @@ Bearbeite `config.json`:
 | Feld | Beschreibung |
 |------|-------------|
 | `device_name` | Name deines Mikrofons (leer = automatisch erkennen) |
-| `action_type` | `keyboard_shortcut` oder `command` |
-| `action` | Der Shortcut (z.B. `ctrl+shift+n`) oder Shell-Befehl |
+| `action_type` | `url`, `keyboard_shortcut` oder `command` |
+| `action` | Die URL, der Shortcut oder Shell-Befehl |
 | `block_original` | `true` = Original-Mute wird blockiert |
 | `trigger_on` | `press` oder `release` |
 | `auto_reconnect` | Automatisch neu verbinden wenn USB-Gerät getrennt wird |
 
 ### Beispiele
+
+**URL öffnen (z.B. neue Konversation in Web-App):**
+```json
+{
+    "action_type": "url",
+    "action": "https://app.curala/new"
+}
+```
 
 **Tastenkombination senden:**
 ```json
@@ -61,7 +69,7 @@ Bearbeite `config.json`:
 }
 ```
 
-**Programm starten:**
+**Shell-Befehl ausführen:**
 ```json
 {
     "action_type": "command",
