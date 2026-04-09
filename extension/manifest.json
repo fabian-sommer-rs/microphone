@@ -6,14 +6,14 @@
   "permissions": ["tabs", "alarms"],
   "host_permissions": [
     "http://127.0.0.1:59213/*",
-    "*://app.curala/*"
+    "*://app.curala.at/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://app.curala/*"],
+      "matches": ["*://app.curala.at/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

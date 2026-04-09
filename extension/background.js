@@ -20,7 +20,7 @@ async function pollTrigger() {
     if (data.triggered) {
       console.log("[MicButton] Trigger received! Sending to app.curala tabs...");
 
-      const tabs = await chrome.tabs.query({ url: "*://app.curala/*" });
+      const tabs = await chrome.tabs.query({ url: "*://app.curala.at/*" });
       for (const tab of tabs) {
         try {
           await chrome.tabs.sendMessage(tab.id, { action: "neue_konsultation" });
@@ -32,7 +32,7 @@ async function pollTrigger() {
       // If no matching tab is open, open one
       if (tabs.length === 0) {
         console.log("[MicButton] No app.curala tab found, opening one...");
-        chrome.tabs.create({ url: "https://app.curala" });
+        chrome.tabs.create({ url: "https://app.curala.at/consultations" });
       }
     }
   } catch (e) {
