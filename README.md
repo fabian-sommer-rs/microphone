@@ -1,31 +1,42 @@
 # Mic Button Remap
 
-Mappt den Mute-Button deines USB-Mikrofons auf eine beliebige Aktion um - z.B. eine neue Konversation in einem Transkriptionsprogramm starten.
+Mappt den Mute-Button deines USB-Mikrofons auf den **"Neue Konsultation"**-Button in [app.curala](https://app.curala).
 
-**Funktioniert auf Windows, macOS und Linux.**
+**Funktioniert auf Windows und macOS.**
 
-## Schnellstart
+## So funktioniert es
 
-### Option 1: Standalone Download (kein Python nötig)
+```
+[Mute-Button am Mikrofon] --> [Python-Script] --> [Browser-Extension] --> [Klick auf "Neue Konsultation"]
+```
 
-1. Gehe zu [Releases](../../releases)
-2. Lade die ZIP-Datei für dein System herunter
-3. Entpacke und starte `MicButtonRemap`
+Das Python-Script erkennt den Mute-Button und sendet ein Signal an die Browser-Extension. Die Extension klickt dann automatisch den "Neue Konsultation"-Button in app.curala.
 
-### Option 2: Mit Python
+## Installation
+
+### Schritt 1: Script installieren
 
 #### Windows
-
-1. [Python installieren](https://python.org) (Haken bei "Add to PATH" setzen!)
+1. [Python installieren](https://python.org) (Haken bei **"Add to PATH"** setzen!)
 2. `install_windows.bat` doppelklicken
 3. Fertig - startet ab jetzt automatisch bei jedem Login
 
 #### macOS
-
 1. Python 3 installieren: `brew install python3`
 2. `install_mac.command` doppelklicken
 3. Accessibility-Rechte vergeben (Systemeinstellungen > Datenschutz > Bedienungshilfen)
 4. Fertig - startet ab jetzt automatisch bei jedem Login
+
+### Schritt 2: Browser-Extension installieren
+
+#### Chrome / Edge
+1. Gehe zu `chrome://extensions` (Chrome) oder `edge://extensions` (Edge)
+2. Aktiviere **"Entwicklermodus"** (Schalter oben rechts)
+3. Klicke **"Entpackte Erweiterung laden"**
+4. Wähle den `extension/` Ordner aus diesem Projekt
+5. Fertig!
+
+Die Extension ist jetzt aktiv und wartet auf Signale vom Python-Script.
 
 ## Konfiguration
 
@@ -34,8 +45,8 @@ Bearbeite `config.json`:
 ```json
 {
     "device_name": "",
-    "action_type": "url",
-    "action": "https://app.curala/new",
+    "action_type": "browser_extension",
+    "trigger_port": 59213,
     "block_original": true,
     "trigger_on": "press",
     "auto_reconnect": true
@@ -45,19 +56,19 @@ Bearbeite `config.json`:
 | Feld | Beschreibung |
 |------|-------------|
 | `device_name` | Name deines Mikrofons (leer = automatisch erkennen) |
-| `action_type` | `url`, `keyboard_shortcut` oder `command` |
-| `action` | Die URL, der Shortcut oder Shell-Befehl |
+| `action_type` | `browser_extension`, `url`, `keyboard_shortcut` oder `command` |
+| `trigger_port` | Port fuer die Kommunikation mit der Extension (Standard: 59213) |
 | `block_original` | `true` = Original-Mute wird blockiert |
 | `trigger_on` | `press` oder `release` |
-| `auto_reconnect` | Automatisch neu verbinden wenn USB-Gerät getrennt wird |
+| `auto_reconnect` | Automatisch neu verbinden wenn USB-Geraet getrennt wird |
 
-### Beispiele
+### Andere Action-Types
 
-**URL öffnen (z.B. neue Konversation in Web-App):**
+**URL oeffnen:**
 ```json
 {
     "action_type": "url",
-    "action": "https://app.curala/new"
+    "action": "https://app.curala"
 }
 ```
 
@@ -69,7 +80,7 @@ Bearbeite `config.json`:
 }
 ```
 
-**Shell-Befehl ausführen:**
+**Shell-Befehl ausfuehren:**
 ```json
 {
     "action_type": "command",
@@ -82,6 +93,8 @@ Bearbeite `config.json`:
 ```bash
 python mic_button_remap.py --uninstall
 ```
+
+Extension: in `chrome://extensions` einfach entfernen.
 
 ## Entwicklung
 

@@ -56,22 +56,95 @@ def create_default_config(config_path: Path):
 
 
 # ---------------------------------------------------------------------------
+# Local HTTP trigger server (communicates with browser extension)
+# ---------------------------------------------------------------------------
+
+class TriggerServer:
+    """Tiny HTTP server that the browser extension polls for trigger events."""
+
+    def __init__(self, port: int = 59213):
+        from http.server import HTTPServer, BaseHTTPRequestHandler
+        import threading
+
+        self.triggered = False
+        self.port = port
+        server_ref = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                if self.path == "/poll":
+                    was_triggered = server_ref.triggered
+                    server_ref.triggered = False
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"triggered": was_triggered}).encode())
+                elif self.path == "/health":
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(b'{"status":"ok"}')
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+
+            def do_OPTIONS(self):
+                self.send_response(200)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+                self.end_headers()
+
+            def log_message(self, format, *args):
+                pass  # Suppress request logs
+
+        self.httpd = HTTPServer(("127.0.0.1", port), Handler)
+        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+
+    def start(self):
+        self.thread.start()
+        logger.info("Trigger server running on http://127.0.0.1:%d", self.port)
+
+    def fire(self):
+        self.triggered = True
+        logger.info("Trigger fired! Extension will pick it up.")
+
+
+# Global trigger server instance
+_trigger_server: TriggerServer | None = None
+
+
+def get_trigger_server(port: int = 59213) -> TriggerServer:
+    global _trigger_server
+    if _trigger_server is None:
+        _trigger_server = TriggerServer(port)
+        _trigger_server.start()
+    return _trigger_server
+
+
+# ---------------------------------------------------------------------------
 # Action execution
 # ---------------------------------------------------------------------------
 
 def execute_action(config: dict):
-    action_type = config.get("action_type", "url")
+    action_type = config.get("action_type", "browser_extension")
     action = config.get("action", "")
 
-    if not action:
-        logger.warning("No action configured")
-        return
-
-    if action_type == "url":
+    if action_type == "browser_extension":
+        server = get_trigger_server(config.get("trigger_port", 59213))
+        server.fire()
+    elif action_type == "url":
         open_url(action)
     elif action_type == "keyboard_shortcut":
+        if not action:
+            logger.warning("No action configured")
+            return
         send_keyboard_shortcut(action)
     elif action_type == "command":
+        if not action:
+            logger.warning("No action configured")
+            return
         logger.info("Running command: %s", action)
         try:
             subprocess.Popen(action, shell=True)
@@ -537,6 +610,10 @@ def run_with_tray(config: dict):
 
 def run_headless(config: dict):
     """Run the listener without tray icon."""
+    # Start trigger server if using browser_extension mode
+    if config.get("action_type") == "browser_extension":
+        get_trigger_server(config.get("trigger_port", 59213))
+
     if SYSTEM == "Windows":
         listen_windows(config)
     elif SYSTEM == "Darwin":

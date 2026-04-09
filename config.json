@@ -1,7 +1,7 @@
 {
     "device_name": "",
-    "action_type": "url",
-    "action": "https://app.curala/new",
+    "action_type": "browser_extension",
+    "trigger_port": 59213,
     "block_original": true,
     "trigger_on": "press",
     "auto_reconnect": true
