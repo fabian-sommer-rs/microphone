@@ -14,14 +14,16 @@ def on_press(key):
     vk = getattr(key, "vk", None)
     name = getattr(key, "name", None)
     char = getattr(key, "char", None)
+    vk_str = f"0x{vk:04X}" if vk is not None else "None"
 
-    print(f"[PRESS]   key={key!r:30s}  vk={vk:#06x if vk else 'None':>8s}  name={name}  char={char}")
+    print(f"[PRESS]   key={key!r}  vk={vk_str}  name={name}  char={char}")
 
 def on_release(key):
     vk = getattr(key, "vk", None)
     name = getattr(key, "name", None)
+    vk_str = f"0x{vk:04X}" if vk is not None else "None"
 
-    print(f"[RELEASE] key={key!r:30s}  vk={vk:#06x if vk else 'None':>8s}  name={name}")
+    print(f"[RELEASE] key={key!r}  vk={vk_str}  name={name}")
 
 with Listener(on_press=on_press, on_release=on_release) as listener:
     listener.join()
