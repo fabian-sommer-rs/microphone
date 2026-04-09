@@ -1,0 +1,8 @@
+{
+    "device_name": "",
+    "action_type": "keyboard_shortcut",
+    "action": "ctrl+shift+n",
+    "block_original": true,
+    "trigger_on": "press",
+    "auto_reconnect": true
+}
