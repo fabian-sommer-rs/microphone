@@ -3,7 +3,7 @@
   "name": "Mic Button - Neue Konsultation",
   "description": "Verbindet den USB-Mikrofon Mute-Button mit der 'Neue Konsultation' Funktion in app.curala",
   "version": "1.0.0",
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "alarms"],
   "host_permissions": [
     "http://127.0.0.1:59213/*",
     "*://app.curala/*"

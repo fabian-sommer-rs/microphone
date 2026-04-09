@@ -7,6 +7,7 @@ const POLL_URL = "http://127.0.0.1:59213/poll";
 const POLL_INTERVAL_MS = 400;
 
 let polling = false;
+let pollTimer = null;
 
 async function pollTrigger() {
   if (polling) return;
@@ -21,7 +22,11 @@ async function pollTrigger() {
 
       const tabs = await chrome.tabs.query({ url: "*://app.curala/*" });
       for (const tab of tabs) {
-        chrome.tabs.sendMessage(tab.id, { action: "neue_konsultation" });
+        try {
+          await chrome.tabs.sendMessage(tab.id, { action: "neue_konsultation" });
+        } catch (e) {
+          console.log("[MicButton] Could not reach tab", tab.id, e.message);
+        }
       }
 
       // If no matching tab is open, open one
@@ -37,15 +42,20 @@ async function pollTrigger() {
   }
 }
 
-// Poll continuously
-setInterval(pollTrigger, POLL_INTERVAL_MS);
+function startPolling() {
+  if (pollTimer) return;
+  pollTimer = setInterval(pollTrigger, POLL_INTERVAL_MS);
+  console.log("[MicButton] Polling started:", POLL_URL);
+}
 
-// Also use chrome.alarms as fallback (keeps service worker alive in MV3)
-chrome.alarms.create("poll-trigger", { periodInMinutes: 0.5 });
+// Start polling when service worker activates
+startPolling();
+
+// Use chrome.alarms to restart polling if service worker was suspended
+chrome.alarms.create("keepalive", { periodInMinutes: 0.5 });
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "poll-trigger") {
+  if (alarm.name === "keepalive") {
+    startPolling();
     pollTrigger();
   }
 });
-
-console.log("[MicButton] Background service worker started. Polling", POLL_URL);
