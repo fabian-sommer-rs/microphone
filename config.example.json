@@ -1,0 +1,26 @@
+{
+    "device_name": "usb microphone",
+
+    "action_type": "command",
+    "action": "echo 'New conversation triggered!'",
+
+    "key_codes": [113, 248],
+    "trigger_on": "press",
+    "grab_device": true,
+    "auto_reconnect": true,
+
+    "_comments": {
+        "device_name": "Substring to match your USB mic name. Use --list-devices to find it. Examples: 'usb microphone', 'Headset Microphone'",
+        "action_type": "One of: 'command' (shell command), 'xdotool' (keyboard shortcut), 'dbus' (DBus message)",
+        "action": "The action to execute. Examples below.",
+        "action_examples": {
+            "command_example": "xdg-open https://your-transcription-app.com/new",
+            "xdotool_shortcut": "ctrl+shift+n",
+            "dbus_example": "--session --dest=com.app.Transcriber /com/app/Transcriber com.app.Transcriber.NewConversation"
+        },
+        "key_codes": "113 = KEY_MUTE, 248 = KEY_MICMUTE, 190 = KEY_F20. Use --monitor to find your button's code.",
+        "trigger_on": "'press' or 'release'",
+        "grab_device": "true = block original mute event, false = keep original mute AND trigger action",
+        "auto_reconnect": "true = automatically reconnect if USB device is disconnected/reconnected"
+    }
+}
